@@ -17,6 +17,7 @@
 | 奶龙要闻 | `#news` | 四条趣味新闻，可按「校园动态 / 学术脑洞 / 生活灵感」筛选 |
 | 入学指南 | `#join` | 入学纪念卡预览与领取入口 |
 | 真实东软 · 学生组织 | `#clubs` | 三家真实存在的学生技术组织卡片，点击进入 [clubs.html](clubs.html) |
+| 同学投稿 | `#submissions` | 三条最新投稿的推荐位，点击进入 [submissions.html](submissions.html) |
 | 常见问题 | — | 三条 FAQ（`<details>` 折叠） |
 
 ## 真实学生组织页
@@ -31,11 +32,54 @@
 - **不搬用素材**：不使用学校校徽与学校 Logo，不取用各组织站点的图片。
 - **引用纪律**：引用「DNUIer 的生存指南」需署名「DNUI Survival Guide 贡献者」并注明 MIT；对它的做法是改写与事实性转述，不整段照搬。
 
+## 同学投稿页
+
+`submissions.html` 展示同学们自己写的、拍的、做的东西。投稿是**真人真事**，页面首屏就用「这一页是什么 / 不是什么」对照区和虚构内容划清边界。
+
+**这一页是生成出来的，不要直接改 `submissions.html`。** 每次改投稿内容后重新生成再提交：
+
+```bash
+node tools/build-submissions.mjs
+```
+
+生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新 `index.html` 里 `<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间的三张推荐卡。校验不通过会直接报错，不会写出半个页面。
+
+**收到一条新投稿**
+
+在 `content/submissions/` 下新建一个 JSON 文件，一条一个文件，文件名建议 `日期-短标题.json`：
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `id` | ✅ | 唯一标识，只用小写字母、数字和连字符；页面上 `#s-{id}` 就是这条的锚点 |
+| `title` | ✅ | 标题 |
+| `author` | ✅ | 投稿人自选的昵称，**不写真实姓名** |
+| `date` | ✅ | 投稿日期，`YYYY-MM-DD` |
+| `category` | ✅ | `writing` 文字故事 / `work` 作品分享 / `photo` 影像记录 / `note` 随手一句 |
+| `college` | — | `code` `ai` `design` `business` `language` `health` 之一，不挂学院就省略 |
+| `summary` | ✅ | 一句话摘要，用在首页推荐卡上 |
+| `paragraphs` | ✅ | 正文段落数组，一段一个字符串 |
+| `tags` | — | 标签数组 |
+| `image` / `imageAlt` | — | 图片路径（放进 `assets/`）与图说；**必须成对出现** |
+| `license` | — | 授权方式，默认 `CC BY-NC-SA 4.0` |
+| `consent` | ✅ | 必须是 `true`，表示投稿人已同意公开展示 |
+| `sample` | — | 演示用的占位内容标记为 `true`，页面上会显示「示例」角标 |
+
+投稿模板在 `.github/ISSUE_TEMPLATE/submission.yml`，想投稿的同学可以直接开 Issue 填写，维护者再整理成 JSON。
+
+**投稿页的内容约束**
+
+- **不加后端**：站点没有任何网络请求、Cookie 和 `localStorage`，投稿不经过服务器，全部靠重新构建发布。
+- **只用昵称**：真实姓名、学号、手机号、宿舍门牌、未公开的聊天记录一律不收，正文里写到同学也要用昵称或模糊说法。
+- **本人同意**：`consent` 为 `false` 的投稿生成器会直接拒绝。
+- **可撤回**：撤稿就是删掉对应的 JSON 再重新生成，页面和首页推荐位会一起更新。
+- `content/` 与 `tools/` 在 `.gitattributes` 里标了 `export-ignore`，只在仓库里用，**不会进入线上产物**——线上只有生成好的 `submissions.html`。
+
 ## 功能
 
 - **入学纪念卡**：填写昵称（≤12 字）并选择学院，在浏览器本地生成纪念卡，可下载为 SVG。卡号格式 `DNLU-xxxxxx-xxxx`，由时间戳加 `crypto.getRandomValues` 随机数组成。昵称不上传、不存储，嵌入 SVG 前经过 XML 转义。
 - **详情弹窗**：要闻、校园导览共用原生 `<dialog>`，关闭后焦点回到触发按钮。
 - **新闻筛选**：按 `data-category` 过滤，按钮状态用 `aria-pressed` 标记。
+- **投稿筛选**：同学投稿页复用同一套筛选逻辑，分类为文字故事 / 作品分享 / 影像记录 / 随手一句。
 - **移动端导航**：汉堡菜单，760px 以下启用。
 - **回到顶部**：滚动超过 600px 后出现。
 - 系统开启「减少动态效果」（`prefers-reduced-motion`）时，关闭平滑滚动和动画。
@@ -48,8 +92,13 @@
 .
 ├── index.html        # 页面结构与全部静态文案
 ├── clubs.html        # 真实东软 · 学生组织（NSS / 微光 / ACM），独立于虚构内容
+├── submissions.html  # 同学投稿展示页（由 tools/build-submissions.mjs 生成，不要手改）
 ├── app.js            # 交互逻辑与弹窗内容数据（原生 JS，无依赖）
 ├── styles.css        # 全部样式（已压缩）
+├── content/
+│   └── submissions/      # 投稿源文件，一条一个 JSON；不上线
+├── tools/
+│   └── build-submissions.mjs  # 投稿页生成器，本地运行；不上线
 ├── colleges/         # 六所脑洞学院的独立介绍页
 │   ├── code.html         # 奶龙软件工程学院
 │   ├── ai.html           # 人工智龙学院
@@ -68,7 +117,7 @@
 └── sitemap.xml
 ```
 
-没有构建步骤，仓库里的文件就是线上部署的产物，改完可以直接发布。
+没有构建步骤，仓库里的文件就是线上部署的产物，改完可以直接发布。唯一的例外是同学投稿页：它由 `tools/build-submissions.mjs` 在本地从 `content/submissions/` 生成，生成的 `submissions.html` 一样提交进仓库，所以**线上跑的始终是静态文件**，部署链没有变化。
 
 ## 本地预览
 
@@ -83,7 +132,7 @@ python -m http.server 8000
 
 **改文案**
 
-- 首页上直接可见的文字都写在 `index.html` 里；六所学院的介绍页在 `colleges/` 下，各自是独立的静态 HTML；真实学生组织页是根目录的 `clubs.html`。
+- 首页上直接可见的文字都写在 `index.html` 里；六所学院的介绍页在 `colleges/` 下，各自是独立的静态 HTML；真实学生组织页是根目录的 `clubs.html`；同学投稿页是根目录的 `submissions.html`，**不要手改**，改 `content/submissions/` 里的 JSON 后重新生成（见上节）。
 - 弹窗里的长文案在 `app.js` 顶部的两个数据对象中：
 
   | 对象 | 对应弹窗 | key（需与 HTML 中的 `data-*` 属性一致） |
@@ -128,7 +177,7 @@ font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-a
 
 其他说明：
 
-- 只改 `README.md`、`CONTRIBUTING.md`、PR 模板的推送不触发部署。需要重新发布时，可以在 Actions 页面手动运行「部署到线上」。
+- 只改 `README.md`、`CONTRIBUTING.md`、PR 模板、`content/` 或 `tools/` 的推送不触发部署。需要重新发布时，可以在 Actions 页面手动运行「部署到线上」。
 - 同一时间只会有一个部署在跑，后来的排队等候。
 - 想回滚到更早的版本，需要登录服务器手动切换 `current` 软链。
 - 部署用到的 Secrets：`DEPLOY_SSH_KEY`、`DEPLOY_HOST`、`DEPLOY_KNOWN_HOSTS`。服务器地址和密钥都不在代码里。

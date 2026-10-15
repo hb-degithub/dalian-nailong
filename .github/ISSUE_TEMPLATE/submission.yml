@@ -1,0 +1,99 @@
+name: 同学投稿
+description: 把你的文字、作品或照片放进 submissions.html（投稿前请先读页面上的「投稿须知」）
+title: "[投稿] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢你愿意写下这些东西。
+
+        这个 Issue 只用来收集投稿内容，**不会自动出现在网站上**：维护者会把内容整理成 `content/submissions/` 下的一个 JSON 文件，重新构建后再发布。发布前会再跟你确认一次。
+
+        投稿前请先读一遍页面上的[投稿须知](https://xn--pssa0vz4e155inzt.com/submissions.html#rules)，特别是不写别人的真实姓名、学号、手机号和宿舍门牌。
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 这条投稿属于哪一类
+      options:
+        - 文字故事（一段经历、一次踩坑、一点感受）
+        - 作品分享（自己写的代码、做的小工具、画的东西）
+        - 影像记录（自己拍的照片或视频截图）
+        - 随手一句（一句想说的话，可以只有一行）
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: 想用的昵称
+      description: 只写昵称，不要写真实姓名。可以用任何你喜欢的称呼。
+      placeholder: 例如：一只夜猫子
+    validations:
+      required: true
+
+  - type: dropdown
+    id: college
+    attributes:
+      label: 想挂在哪所脑洞学院下面（可跳过）
+      description: 只是页面上的趣味归类，不影响别的。
+      options:
+        - 不挂学院
+        - 奶龙软件工程学院
+        - 人工智龙学院
+        - 数字摸鱼艺术学院
+        - 零食数字商学院
+        - 龙语国际交流学院
+        - 健康午睡科技学院
+    validations:
+      required: false
+
+  - type: input
+    id: title
+    attributes:
+      label: 标题
+      description: 一句话就好，不用想得太正式。
+      placeholder: 例如：第一次把 Hello World 打印出来的时候
+    validations:
+      required: true
+
+  - type: textarea
+    id: body
+    attributes:
+      label: 正文
+      description: 想写多长都行。分几段的话，段与段之间空一行。
+      placeholder: 直接写在这里就可以了。
+    validations:
+      required: true
+
+  - type: textarea
+    id: images
+    attributes:
+      label: 图片（可选）
+      description: 把图片直接拖进这个输入框即可。请注明每张图拍的是什么、是不是你自己拍的。
+      placeholder: 例如：第一张是 2026 年秋天在第三教学楼拍的楼梯，我自己拍的。
+    validations:
+      required: false
+
+  - type: input
+    id: license
+    attributes:
+      label: 授权方式（可跳过）
+      description: 不填默认 CC BY-NC-SA 4.0（署名 · 非商业性使用 · 相同方式共享）。
+      placeholder: 例如：CC BY-NC-SA 4.0
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: 发布前需要你确认这几件事
+      options:
+        - label: 这些内容是我自己写的、自己拍的或自己做的，引用别人的地方我会写明出处。
+          required: true
+        - label: 我同意以我填写的昵称公开展示这些内容。
+          required: true
+        - label: 内容里没有别人的真实姓名、学号、手机号、宿舍门牌或未公开的聊天记录。
+          required: true
+        - label: 我知道这一条发布后还可以随时要求修改或撤回。
+          required: true

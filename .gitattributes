@@ -2,3 +2,6 @@ README.md export-ignore
 CONTRIBUTING.md export-ignore
 .gitattributes export-ignore
 .github export-ignore
+# 投稿源文件与生成器只在本地用，线上只要生成好的 HTML
+content export-ignore
+tools export-ignore
