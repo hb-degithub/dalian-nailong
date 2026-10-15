@@ -10,3 +10,69 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 @media(max-width:760px){.utility-inner{height:auto;min-height:30px;padding-block:6px;justify-content:center}.utility-inner>span{display:none}.utility-links{flex-shrink:1;flex-wrap:wrap;justify-content:center;gap:4px 16px}}
 @media(max-width:430px){.utility-links{display:grid;grid-template-columns:auto auto;justify-content:center}}
+/* ===== 学院独立介绍页 ===== */
+.college-hero{position:relative;display:flex;align-items:flex-end;min-height:470px;padding:86px 0 52px;background:var(--navy);color:#fff;isolation:isolate;overflow:hidden}
+.college-hero-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;z-index:0}
+.college-hero-shade{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#10202f73,#10202ff2 82%),linear-gradient(90deg,#10202fe6,#10202f00 76%)}
+.college-hero-content{position:relative;z-index:2;width:min(1240px,calc(100% - 96px));margin-inline:auto}
+.college-hero-content h1{font-family:var(--serif);font-size:clamp(29px,4.3vw,53px);line-height:1.22;font-weight:900}
+.college-hero-motto{font-family:var(--serif);font-size:clamp(15px,1.7vw,21px);color:var(--yellow);margin-top:14px}
+.college-hero-desc{font-size:14px;line-height:2;color:#ffffffd6;margin-top:13px;max-width:38em}
+.college-hero-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.college-hero-tags span{border:1px solid #ffffff3d;padding:5px 15px;font-size:12px;color:#ffffffe8}
+.college-back{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:600;color:#ffffffc2;border-bottom:1px solid #ffffff3d;padding-bottom:6px;margin-bottom:26px}
+.college-back:hover{color:var(--yellow);border-color:var(--yellow)}
+.college-subnav{background:var(--paper);border-bottom:1px solid var(--line)}
+.college-subnav ul{display:flex;align-items:center;gap:27px;list-style:none;margin:0;padding:0;overflow-x:auto;font-size:12px;font-weight:600}
+.college-subnav a{display:block;padding:16px 0;white-space:nowrap;color:var(--muted);border-bottom:2px solid transparent}
+.college-subnav a:hover{color:var(--ink);border-bottom-color:var(--yellow)}
+.college-intro-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:58px;align-items:start}
+.college-lead{font-family:var(--serif);font-size:19px;line-height:1.95;margin-bottom:19px}
+.college-body{font-size:13.5px;line-height:2.05;color:#657078;margin-bottom:14px}
+.college-facts{border:1px solid var(--line);background:var(--paper);padding:2px 26px 18px}
+.college-facts h3{font-size:13px;letter-spacing:.8px;padding:21px 0 11px;border-bottom:1px solid var(--line)}
+.college-facts dl{margin:0}
+.college-facts dl>div{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:12px}
+.college-facts dl>div:last-child{border-bottom:0}
+.college-facts dt{color:var(--muted);flex-shrink:0}
+.college-facts dd{margin:0;font-weight:700;text-align:right}
+.college-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dadfdc;border:1px solid #dadfdc}
+.college-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#dadfdc;border:1px solid #dadfdc}
+.course-card,.faculty-card,.work-card{background:#fff;min-width:0}
+.course-card{padding:27px 25px 30px;display:flex;flex-direction:column;gap:9px}
+.course-no{font-family:Georgia,serif;font-size:12px;letter-spacing:1.4px;color:#a2905f}
+.course-card h3{font-family:var(--serif);font-size:19px;line-height:1.5}
+.course-card>p{font-size:12.5px;line-height:1.95;color:#657078}
+.course-meta{margin-top:auto;padding-top:15px;border-top:1px dashed var(--line);font-size:11.5px;line-height:1.85;color:var(--muted)}
+.course-meta b{color:var(--ink)}
+.course-card code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;background:var(--paper);border:1px solid var(--line);padding:1px 5px}
+.faculty-card{padding:27px 21px 29px;text-align:center}
+.faculty-face{width:66px;height:66px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:var(--yellow-light);font-family:Georgia,serif;font-size:24px;font-weight:700;color:var(--navy)}
+.faculty-card h3{font-family:var(--serif);font-size:17px;line-height:1.5}
+.faculty-role{font-size:10.5px;letter-spacing:.6px;font-weight:700;color:#967a31;margin-top:6px}
+.faculty-card>p{font-size:12px;line-height:1.9;color:#657078;margin-top:12px}
+.work-card{padding:26px 25px 29px}
+.work-card .tiny-label{color:#967a31}
+.work-card h3{font-family:var(--serif);font-size:18px;line-height:1.55;margin-top:11px}
+.work-card>p{font-size:12.5px;line-height:1.95;color:#657078;margin-top:10px}
+.graduation-panel{background:var(--yellow-light);border-left:4px solid var(--yellow);padding:38px 40px}
+.graduation-panel .tiny-label{color:#937730}
+.graduation-panel blockquote{margin:15px 0 0;font-family:var(--serif);font-size:clamp(17px,2vw,23px);line-height:1.85}
+.graduation-panel p{font-size:12px;line-height:1.95;color:#657078;margin-top:17px}
+.real-compare{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#dadfdc;border:1px solid #dadfdc}
+.real-compare>div{background:#fff;padding:27px 25px 30px}
+.real-compare h3{font-size:13px;letter-spacing:.8px;margin-bottom:13px}
+.real-compare .is-real h3{color:#967a31}
+.real-compare ul{margin:0;padding-left:19px;font-size:12.5px;line-height:2.05;color:#657078}
+.real-compare a{border-bottom:1px solid #b9ab7d}
+.college-note{margin-top:22px;padding:17px 20px;background:var(--yellow-light);font-size:12px;line-height:1.95;color:#5c666e}
+.college-note a{border-bottom:1px solid #b9ab7d}
+.college-pager{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#dadfdc;border:1px solid #dadfdc;margin-top:58px}
+.college-pager a{display:block;background:#fff;padding:24px 26px;transition:background .2s}
+.college-pager a:hover{background:var(--paper)}
+.college-pager span{display:block;font-size:10px;letter-spacing:1.4px;font-weight:700;color:#967a31}
+.college-pager strong{display:block;font-family:var(--serif);font-size:18px;margin-top:9px}
+.college-pager a.is-next{text-align:right}
+@media(max-width:1180px){.college-hero-content{width:calc(100% - 64px)}.college-intro-grid{gap:40px}.college-facts{padding-inline:22px}.faculty-card{padding-inline:17px}}
+@media(max-width:960px){.college-hero{min-height:0;padding:60px 0 46px}.college-hero-content{width:calc(100% - 64px)}.college-intro-grid{grid-template-columns:1fr;gap:34px}.college-grid-3,.college-grid-4{grid-template-columns:1fr 1fr}.real-compare{grid-template-columns:1fr}.graduation-panel{padding:30px 26px}}
+@media(max-width:760px){.college-hero{padding:44px 0 40px}.college-hero-content{width:calc(100% - 40px)}.college-subnav ul{gap:19px;font-size:11px}.college-grid-3,.college-grid-4{grid-template-columns:1fr}.college-pager{grid-template-columns:1fr;margin-top:44px}.college-pager a.is-next{text-align:left}.college-facts{padding-inline:19px}.college-hero-tags span{font-size:11px;padding:4px 12px}}
