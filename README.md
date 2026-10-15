@@ -12,7 +12,7 @@
 |---|---|---|
 | 首屏 | `#home` | 主视觉、两个入口按钮、校园快讯条 |
 | 学校概况 | `#about` | 灵感来源介绍、趣味校训「精勤博学，吃饱再学」 |
-| 学院设置 | `#colleges` | 六大脑洞学院卡片，点击弹出学院详情 |
+| 学院设置 | `#colleges` | 六大脑洞学院卡片，点击进入各学院独立介绍页 |
 | 校园生活 | `#campus` | 三张校园漫游卡片，点击弹出图文导览 |
 | 奶龙要闻 | `#news` | 四条趣味新闻，可按「校园动态 / 学术脑洞 / 生活灵感」筛选 |
 | 入学指南 | `#join` | 入学纪念卡预览与领取入口 |
@@ -21,7 +21,7 @@
 ## 功能
 
 - **入学纪念卡**：填写昵称（≤12 字）并选择学院，在浏览器本地生成纪念卡，可下载为 SVG。卡号格式 `DNLU-xxxxxx-xxxx`，由时间戳加 `crypto.getRandomValues` 随机数组成。昵称不上传、不存储，嵌入 SVG 前经过 XML 转义。
-- **详情弹窗**：学院、要闻、校园导览共用原生 `<dialog>`，关闭后焦点回到触发按钮。
+- **详情弹窗**：要闻、校园导览共用原生 `<dialog>`，关闭后焦点回到触发按钮。
 - **新闻筛选**：按 `data-category` 过滤，按钮状态用 `aria-pressed` 标记。
 - **移动端导航**：汉堡菜单，760px 以下启用。
 - **回到顶部**：滚动超过 600px 后出现。
@@ -36,12 +36,19 @@
 ├── index.html        # 页面结构与全部静态文案
 ├── app.js            # 交互逻辑与弹窗内容数据（原生 JS，无依赖）
 ├── styles.css        # 全部样式（已压缩）
+├── colleges/         # 六所脑洞学院的独立介绍页
+│   ├── code.html         # 奶龙软件工程学院
+│   ├── ai.html           # 人工智龙学院
+│   ├── design.html       # 数字摸鱼艺术学院
+│   ├── business.html     # 零食数字商学院
+│   ├── language.html     # 龙语国际交流学院
+│   └── health.html       # 健康午睡科技学院
 ├── assets/
-│   ├── hero-campus.webp      # 首屏主视觉（AI 创作）
-│   ├── campus-overview.webp  # 学校概况配图；「漫游校园」导览弹窗配图
-│   ├── campus-autumn.webp    # 校园生活卡片 · 漫游校园
-│   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图
-│   ├── campus-seasons.webp   # 校园生活卡片 · 四季；四季导览弹窗配图
+│   ├── hero-campus.webp      # 首屏主视觉（AI 创作）；健康午睡科技学院页配图
+│   ├── campus-overview.webp  # 学校概况配图；「漫游校园」导览弹窗配图；人工智龙学院页配图
+│   ├── campus-autumn.webp    # 校园生活卡片 · 漫游校园；数字摸鱼艺术学院页配图
+│   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图；零食数字商学院页配图
+│   ├── campus-seasons.webp   # 校园生活卡片 · 四季；四季导览弹窗配图；龙语国际交流学院页配图
 │   └── seal.svg              # 趣味校徽，同时作为 favicon
 ├── robots.txt
 └── sitemap.xml
@@ -62,16 +69,17 @@ python -m http.server 8000
 
 **改文案**
 
-- 首页上直接可见的文字都写在 `index.html` 里。
-- 弹窗里的长文案在 `app.js` 顶部的三个数据对象中：
+- 首页上直接可见的文字都写在 `index.html` 里；六所学院的介绍页在 `colleges/` 下，各自是独立的静态 HTML。
+- 弹窗里的长文案在 `app.js` 顶部的两个数据对象中：
 
   | 对象 | 对应弹窗 | key（需与 HTML 中的 `data-*` 属性一致） |
   |---|---|---|
-  | `colleges` | 学院详情、纪念卡上的学院名 | `code` `ai` `design` `business` `language` `health` → `data-college` |
   | `stories` | 奶龙要闻 | `welcome` `debug` `canteen` `society` → `data-story` |
   | `tours` | 校园导览 | `campus` `sovo` `seasons` → `data-tour` |
 
-  新增学院时，需要同步修改三处：`colleges` 对象、`#colleges` 中的卡片、纪念卡表单里 `#student-college` 的 `<option>`。
+  `colleges` 对象保存六所学院的名称，供纪念卡表单校验和卡片文案使用；学院详情本身写在各学院页里。
+
+  新增学院时，需要同步修改四处：`colleges` 对象、`#colleges` 中的卡片、`colleges/` 下新建的页面、纪念卡表单里 `#student-college` 的 `<option>`。
 
 **缓存版本号**
 
