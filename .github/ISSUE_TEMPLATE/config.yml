@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 投稿前先读「投稿须知」
+    url: https://xn--pssa0vz4e155inzt.com/submissions.html#rules
+    about: 哪些内容不收、署名怎么处理、发布后怎么要求修改或撤回，都写在这页里。
+  - name: 想自己动手改网站
+    url: https://github.com/zp-home/dalian-nailong/blob/main/CONTRIBUTING.md
+    about: 提交信息格式、CSP 与缓存版本号的注意事项、投稿内容的生成流程。

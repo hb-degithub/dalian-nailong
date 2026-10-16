@@ -1,0 +1,57 @@
+name: 想要一个新东西
+description: 新板块、新玩法、新的趣味细节，或者只是「这里可以更好」
+title: "[想法] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎随便想。本站是纯静态的趣味创作站：没有后端、没有数据库，也不引入外部 CDN 资源（线上有 CSP 挡着），所以「加一个登录」「接一个接口」这类想法大概率做不了，但很欢迎你说说想解决什么，往往有别的做法。
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你想要什么
+      description: 一句话说清楚就行，剩下的可以在评论里聊。
+      placeholder: 例如：希望纪念卡能存成图片，直接发到微信里。
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么想要它
+      description: 你想解决的是什么问题、在什么场景下会用到。
+    validations:
+      required: false
+
+  - type: input
+    id: where
+    attributes:
+      label: 大概放在哪儿（可跳过）
+      description: 哪个页面、哪个位置，或者「还没想好」。
+      placeholder: 例如：同学投稿页顶部 / 学院页面底部
+    validations:
+      required: false
+
+  - type: dropdown
+    id: help
+    attributes:
+      label: 你愿意一起做吗
+      options:
+        - 只是提个想法，实现交给别人
+        - 我可以试着写代码，提个 PR
+        - 我可以帮忙找素材、写文案或测试
+        - 还不确定
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前顺手确认
+      options:
+        - label: 这个想法不涉及后端、登录或外部接口（涉及的话我也写清楚了想解决的问题）。
+          required: false
+        - label: 我贴出来的内容里没有别人的真实姓名、学号、手机号、宿舍门牌或未公开的聊天记录。
+          required: true
