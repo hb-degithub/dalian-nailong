@@ -287,7 +287,6 @@ function renderTeaser(item) {
 /* -------------------------------------------------------- 页面正文生成 */
 
 function buildMain(items) {
-  const sampleCount = items.filter((item) => item.sample).length;
   const hero = readImageSize(HERO_IMAGE);
   const listInner = items.length > 0
     ? `    <div class="submission-grid">\n${items.map(renderCard).join('\n')}\n    </div>`
@@ -340,7 +339,7 @@ ${listInner}
       <p><strong>三、不写别人的隐私。</strong>真实姓名、学号、手机号、宿舍门牌、未公开的群聊记录一律不要出现在投稿里；写到同学时请用昵称或模糊说法。</p>
       <p><strong>四、随时可以撤回。</strong>投稿发布后如果改变主意，在仓库里说一声，维护者会把这一条从页面上移除并重新发布。</p>
     </div>
-    <p class="college-note">当前页面上标着「示例」的条目，是为了把界面演示清楚而放的占位内容，不是真实投稿；收到第一条真实投稿后就会被替换掉。投稿里如果有事实性错误，欢迎在 <a href="https://github.com/zp-home/dalian-nailong/issues" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>指出，我们改完会重新发布。</p>${sampleCount > 0 ? '' : ''}
+    <p class="college-note">当前页面上标着「示例」的条目，是为了把界面演示清楚而放的占位内容，不是真实投稿；收到第一条真实投稿后就会被替换掉。投稿里如果有事实性错误，欢迎在 <a href="https://github.com/zp-home/dalian-nailong/issues" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>指出，我们改完会重新发布。</p>
   </div></section>
   <section class="section" id="sources" aria-labelledby="sub-sources-title"><div class="container">
     <div class="section-head"><div><p class="eyebrow">05 / SOURCES &amp; CREDITS</p><h2 id="sub-sources-title">来源与引用</h2></div><p>这一页的内容从哪来，<br>以及怎么署名。</p></div>
