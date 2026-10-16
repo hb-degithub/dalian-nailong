@@ -436,6 +436,59 @@
       updateBackToTop();
     }
 
+    // 当前所在位置：导航里指向本页的链接标 aria-current="page"，
+    // 首页上的分节链接跟着滚动标 aria-current="location"（样式见 styles.css 的 #site-nav>a[aria-current]）。
+    if (navigation) {
+      const here = window.location.pathname.replace(/\/index\.html$/, '/');
+      const targets = Array.from(navigation.querySelectorAll('a[href]')).map((link) => {
+        const url = new URL(link.getAttribute('href'), window.location.href);
+        return { link, path: url.pathname.replace(/\/index\.html$/, '/'), section: url.hash.slice(1) };
+      });
+
+      targets.forEach(({ link, path, section }) => {
+        if (path === here && !section) link.setAttribute('aria-current', 'page');
+      });
+
+      // 只认「指向本页某个分节」的链接，其它页面上的导航不参与滚动跟随。
+      const watching = targets
+        .filter(({ path, section }) => path === here && section)
+        .map(({ link, section }) => ({ link, element: document.getElementById(section) }))
+        .filter(({ element }) => element);
+
+      if (watching.length) {
+        let current;
+        let spyFramePending = false;
+        const updateCurrentSection = () => {
+          spyFramePending = false;
+          // 取视口 40% 处那条线：最后一个顶部越过它的分节就是当前分节。
+          const line = window.innerHeight * 0.4;
+          let next = null;
+          let lowest = -Infinity;
+          watching.forEach(({ element }) => {
+            const top = element.getBoundingClientRect().top;
+            if (top <= line && top > lowest) {
+              lowest = top;
+              next = element;
+            }
+          });
+          if (next === current) return;
+          current = next;
+          watching.forEach(({ link, element }) => {
+            if (element === next) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+          });
+        };
+        window.addEventListener('scroll', () => {
+          if (spyFramePending) return;
+          spyFramePending = true;
+          window.requestAnimationFrame(updateCurrentSection);
+        }, { passive: true });
+        window.addEventListener('resize', updateCurrentSection);
+        window.addEventListener('load', updateCurrentSection);
+        updateCurrentSection();
+      }
+    }
+
     document.documentElement.classList.add('js-ready');
   });
 })();

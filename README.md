@@ -95,6 +95,7 @@ node tools/build-submissions.mjs
 ├── index.html        # 页面结构与全部静态文案
 ├── clubs.html        # 真实东软 · 学生组织（NSS / 微光 / ACM），独立于虚构内容
 ├── submissions.html  # 同学投稿展示页（由 tools/build-submissions.mjs 生成，不要手改）
+├── 404.html          # 地址不存在时的落点；站内链接写成根绝对路径，因为它会在任意深度被访问
 ├── app.js            # 交互逻辑与弹窗内容数据（原生 JS，无依赖）
 ├── styles.css        # 全部样式（已压缩）
 ├── content/
@@ -120,6 +121,8 @@ node tools/build-submissions.mjs
 ```
 
 没有构建步骤，仓库里的文件就是线上部署的产物，改完可以直接发布。唯一的例外是同学投稿页：它由 `tools/build-submissions.mjs` 在本地从 `content/submissions/` 生成，生成的 `submissions.html` 一样提交进仓库，所以**线上跑的始终是静态文件**，部署链没有变化。
+
+`404.html` 是访问不存在的地址时的落点：它故意不写 canonical（任意错误地址没有唯一的规范地址），改挂 `noindex`，也不进 `sitemap.xml`。要让它真正生效，服务器得把找不到的路径交给它——nginx 里是 `error_page 404 /404.html;`，换别的服务器就用对应的 404 配置。只把文件提交进仓库、服务器没配这一行的话，线上看到的仍然是服务器自带的错误页。
 
 ## 本地预览
 
