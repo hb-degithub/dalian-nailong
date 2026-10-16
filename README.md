@@ -199,6 +199,56 @@ font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-a
 
 服务器还需要配置这些响应头：上节的 CSP、`X-Content-Type-Options: nosniff`、`Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: SAMEORIGIN`。缓存规则是：`index.html` 设为 `no-store`，静态资源缓存 1 小时。
 
+### Cloudflare Pages（第二套托管）
+
+除了上面那条 SSH 流程，这个仓库也可以整份传到 Cloudflare Pages。Pages 上目前挂着 **宇宙奶龙大学.vip**（`xn--psszg58cydsdq780c.vip`），默认地址是 `dalian-nailong.pages.dev`。两边跑的是同一份产物，页面没有区别，差别只在托管方式和地址。
+
+直传一次的做法：
+
+1. `git archive HEAD -o site.tar`，解压到一个空目录——`export-ignore` 的规则在这里照旧生效，包里天然只有站点文件。
+2. 往目录里补两个 Cloudflare 专用文件。它们**故意不入库**：仓库里放它们只会给 nginx 那套添两个无关文件。
+3. `tar -a -c -f site.zip site` 打包。**不要用 PowerShell 的 `Compress-Archive`**：它写出的 zip 用反斜杠当路径分隔符，Pages 不认。
+4. `npx wrangler@4 pages deploy site --project-name=dalian-nailong --branch=main`。
+
+**`_headers`**——Cloudflare Pages 的响应头来自服务器配置而不是 HTML（CSP 从来不在页面里），所以这份 CSP 只能靠它下发；顺带把 `.webmanifest` 的 MIME 类型补齐，nginx 那边还要单独配一条，这里一次解决：
+
+```text
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+
+/site.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8
+```
+
+**`_redirects`**——Pages 默认把 `/clubs.html` 用 308 跳到 `/clubs`，而本站从建立之初就用 `.html` 形式的地址（sitemap、canonical、页面内链接全是），所以要原样提供出去。这些规则本身不会被无扩展名的地址再匹配到，不会形成循环：
+
+```text
+/index.html                /                   200
+/clubs.html                /clubs              200
+/submissions.html          /submissions        200
+/404.html                  /404                200
+/colleges/ai.html          /colleges/ai        200
+/colleges/business.html    /colleges/business  200
+/colleges/code.html        /colleges/code      200
+/colleges/design.html      /colleges/design    200
+/colleges/health.html      /colleges/health    200
+/colleges/language.html    /colleges/language  200
+```
+
+绑定自定义域名：
+
+1. 先把域名加到 Pages 项目上（后台的「自定义域」，或者 `POST /accounts/<账号 id>/pages/projects/dalian-nailong/domains`）。
+2. 再加一条 DNS 记录：类型 `CNAME`、名称 `@`、目标 `dalian-nailong.pages.dev`、**代理必须开启**（橙云）。从后台界面添加域名时 Cloudflare 会顺手把这条记录建好；**用 API 添加则不会**，项目会一直停在 `CNAME record not set`，得自己补。
+3. 等状态从 `pending` 变成 `active`（通常几分钟），证书随之自动签发。
+
+两个已知的 Cloudflare 行为：
+
+- 走 Cloudflare 代理的 HTML 会被注入一个 Web Analytics 埋点（`static.cloudflareinsights.com`）。本站 CSP 是 `script-src 'self'`，这条外部脚本会被自己的 CSP 挡掉——功能没有任何影响，只是访客控制台会多一条报错，分析数据也收不到。想彻底关掉，要去 Cloudflare 后台关掉 Web Analytics 的「自动安装」。
+- `404.html` 在 Pages 上直接生效，不需要任何服务器配置；上面那套 nginx 则必须显式写 `error_page 404 /404.html;`，否则错误地址只会得到一张默认的纯文本页。
+
+维护时要记住：CSP 现在同时存在于服务器配置和 `_headers` 两份里，改了一边忘了另一边，两套托管就会不一致。
+
 ## 参与修改
 
 分支、提交信息、PR 的约定和改动自查项见 [CONTRIBUTING.md](CONTRIBUTING.md)。
