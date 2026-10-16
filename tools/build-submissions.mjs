@@ -4,14 +4,15 @@
  * 用法（在仓库根目录执行）：
  *   node tools/build-submissions.mjs
  *
- * 它做五件事：
+ * 它做六件事：
  *   1. 读取 content/submissions/*.json，逐条校验；
  *   2. 生成 submissions.html（投稿展示页）；
  *   3. 把首页 <!-- submissions:start --> 与 <!-- submissions:end --> 之间的
  *      推荐位替换成最新几条投稿；
  *   4. 把首页 <!-- bulletin:start --> 与 <!-- bulletin:end --> 之间的快讯条
  *      换成最新一条真实投稿（没有真实投稿时回到固定文案）；
- *   5. 给 sitemap.xml 里跟着投稿变的两个地址写 lastmod。
+ *   5. 给 sitemap.xml 里跟着投稿变的两个地址写 lastmod；
+ *   6. 生成 feed.xml（Atom 订阅源），条目与投稿页一一对应。
  *
  * 站点是纯静态的：这个脚本只在本地跑，产物是要提交进仓库的 HTML。
  * 发布仍然靠「推送到 main → Actions 打包上线」，部署链没有任何改动。
@@ -29,8 +30,18 @@ const TEMPLATE = path.join(ROOT, 'clubs.html');
 const OUTPUT = path.join(ROOT, 'submissions.html');
 const HOMEPAGE = path.join(ROOT, 'index.html');
 const SITEMAP = path.join(ROOT, 'sitemap.xml');
+const FEED = path.join(ROOT, 'feed.xml');
 
 const SITE = 'https://xn--pssa0vz4e155inzt.com';
+const FEED_URL = `${SITE}/feed.xml`;
+const FEED_TITLE = '大连奶龙大学 · 同学投稿';
+const FEED_SUBTITLE = '投稿页上的每一条都会出现在这里。带「示例 · 」前缀的是演示界面用的示例内容，不是真实投稿。';
+/**
+ * 一条投稿都没有时用它兜底：Atom 规定 feed 必须有 updated，而这里不能拿脚本运行的
+ * 时间冒充发布时间——每次跑出来的产物必须一模一样，否则校验工作流会永远飘红。
+ * 这个日期是投稿页做完的那天，只是占位，不代表有任何投稿。
+ */
+const FEED_EMPTY_UPDATED = '2026-10-15T00:00:00+08:00';
 const HOMEPAGE_TEASER_COUNT = 3;
 
 /** 投稿页首屏主图。分享用的 og:image 必须跟它一致，所以只在这里写一次。 */
@@ -65,6 +76,9 @@ const escapeHTML = (value) =>
     .replace(/>/g, '&gt;');
 
 const escapeAttr = (value) => escapeHTML(value).replace(/"/g, '&quot;');
+
+/** XML 里多两个要转的字符：引号与单引号。 */
+const escapeXML = (value) => escapeAttr(value).replace(/'/g, '&apos;');
 
 const fail = (file, message) => {
   throw new Error(`content/submissions/${file}：${message}`);
@@ -457,6 +471,65 @@ function updateSitemap(items) {
   return false;
 }
 
+/* -------------------------------------------------------------- 订阅源 */
+
+/**
+ * 生成 Atom 订阅源：一条投稿一个 entry，顺序与投稿页一致（新的在前）。
+ *
+ * 几个刻意的选择：
+ *   - 源 JSON 只有「日期」没有「时刻」，所以统一补 T00:00:00+08:00，
+ *     不拿脚本运行时间冒充发布时间（否则每次跑都会产生 diff）。
+ *   - 示例投稿也进来（投稿页上就有它们，且带「示例」角标），标题前面加「示例 · 」，
+ *     订阅者一眼能看出来；真实投稿进来、示例文件删掉之后，这个前缀自然就没了。
+ *   - id 用带锚点的投稿页地址：同一条投稿被重新编辑时保持不变。
+ */
+function buildFeed(items) {
+  const stamp = (date) => `${date}T00:00:00+08:00`;
+  const updated = items.length > 0 ? stamp(items[0].sortKey) : FEED_EMPTY_UPDATED;
+
+  const entries = items.map((item) => {
+    const url = `${SITE}/submissions.html#s-${item.id}`;
+    const title = item.sample ? `示例 · ${item.title}` : item.title;
+    return [
+      '  <entry>',
+      `    <title>${escapeXML(title)}</title>`,
+      `    <link rel="alternate" type="text/html" href="${escapeXML(url)}"/>`,
+      `    <id>${escapeXML(url)}</id>`,
+      `    <published>${stamp(item.sortKey)}</published>`,
+      `    <updated>${stamp(item.sortKey)}</updated>`,
+      `    <category term="${escapeXML(item.category)}" label="${escapeXML(item.categoryLabel)}"/>`,
+      `    <author><name>${escapeXML(item.author)}</name></author>`,
+      `    <summary>${escapeXML(item.summary)}</summary>`,
+      '  </entry>'
+    ].join('\n');
+  });
+
+  return [
+    '<?xml version="1.0" encoding="utf-8"?>',
+    '<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN">',
+    `  <title>${escapeXML(FEED_TITLE)}</title>`,
+    `  <subtitle>${escapeXML(FEED_SUBTITLE)}</subtitle>`,
+    `  <link rel="self" type="application/atom+xml" href="${FEED_URL}"/>`,
+    `  <link rel="alternate" type="text/html" href="${SITE}/submissions.html"/>`,
+    `  <id>${FEED_URL}</id>`,
+    `  <updated>${updated}</updated>`,
+    `  <icon>${SITE}/assets/icon-192.png</icon>`,
+    `  <author><name>大连奶龙大学</name><uri>${SITE}/</uri></author>`,
+    '  <rights>署名归原作者；内容按各条标注的授权方式使用，未标注的默认 CC BY-NC-SA 4.0。</rights>',
+    ...entries,
+    '</feed>',
+    ''
+  ].join('\n');
+}
+
+/** 内容没变就不动文件：免得校验工作流看到一堆无意义的 diff。 */
+function writeFeed(items) {
+  const xml = buildFeed(items);
+  if (fs.existsSync(FEED) && fs.readFileSync(FEED, 'utf8') === xml) return false;
+  fs.writeFileSync(FEED, xml, 'utf8');
+  return true;
+}
+
 /* ------------------------------------------------------------------ 主流程 */
 
 const items = loadSubmissions();
@@ -465,12 +538,14 @@ fs.writeFileSync(OUTPUT, page, 'utf8');
 
 const homepageChanged = updateHomepage(items);
 const sitemapChanged = updateSitemap(items);
+const feedChanged = writeFeed(items);
 
 const sampleCount = items.filter((item) => item.sample).length;
 console.log(`投稿条数：${items.length}（其中示例 ${sampleCount} 条）`);
 console.log(`已生成 submissions.html（${page.length} 字符）`);
 console.log(`首页推荐位与快讯条：${homepageChanged ? '已更新' : '无变化'}`);
 console.log(`sitemap.xml：${sitemapChanged ? '已更新 lastmod' : '无变化'}`);
+console.log(`feed.xml：${feedChanged ? '已更新' : '无变化'}`);
 if (sampleCount > 0) {
   console.log('提示：示例内容仅用于演示界面，收到真实投稿后请把 content/submissions/ 下的 sample-*.json 删掉再重新生成。');
 }

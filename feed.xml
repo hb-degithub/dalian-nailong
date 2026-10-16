@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-CN">
+  <title>大连奶龙大学 · 同学投稿</title>
+  <subtitle>投稿页上的每一条都会出现在这里。带「示例 · 」前缀的是演示界面用的示例内容，不是真实投稿。</subtitle>
+  <link rel="self" type="application/atom+xml" href="https://xn--pssa0vz4e155inzt.com/feed.xml"/>
+  <link rel="alternate" type="text/html" href="https://xn--pssa0vz4e155inzt.com/submissions.html"/>
+  <id>https://xn--pssa0vz4e155inzt.com/feed.xml</id>
+  <updated>2026-10-06T00:00:00+08:00</updated>
+  <icon>https://xn--pssa0vz4e155inzt.com/assets/icon-192.png</icon>
+  <author><name>大连奶龙大学</name><uri>https://xn--pssa0vz4e155inzt.com/</uri></author>
+  <rights>署名归原作者；内容按各条标注的授权方式使用，未标注的默认 CC BY-NC-SA 4.0。</rights>
+  <entry>
+    <title>示例 · 第一次把 Hello World 打印出来的时候</title>
+    <link rel="alternate" type="text/html" href="https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-10-06-first-hello-world"/>
+    <id>https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-10-06-first-hello-world</id>
+    <published>2026-10-06T00:00:00+08:00</published>
+    <updated>2026-10-06T00:00:00+08:00</updated>
+    <category term="writing" label="文字故事"/>
+    <author><name>一只夜猫子</name></author>
+    <summary>从一片报错到屏幕上那行绿色的字，用了两个晚上，也认识了一个愿意陪我看代码的同学。</summary>
+  </entry>
+  <entry>
+    <title>示例 · 食堂三楼靠窗那排座位，下午四点的光很好看</title>
+    <link rel="alternate" type="text/html" href="https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-10-01-canteen-note"/>
+    <id>https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-10-01-canteen-note</id>
+    <published>2026-10-01T00:00:00+08:00</published>
+    <updated>2026-10-01T00:00:00+08:00</updated>
+    <category term="note" label="随手一句"/>
+    <author><name>上课偷看窗外</name></author>
+    <summary>一句很短的话，配一张随手拍的照片。留给自己，也留给同样喜欢那个位置的人。</summary>
+  </entry>
+  <entry>
+    <title>示例 · 花一周写了个「哪间教室还亮着灯」的小网页</title>
+    <link rel="alternate" type="text/html" href="https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-09-28-classroom-monitor"/>
+    <id>https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-09-28-classroom-monitor</id>
+    <published>2026-09-28T00:00:00+08:00</published>
+    <updated>2026-09-28T00:00:00+08:00</updated>
+    <category term="work" label="作品分享"/>
+    <author><name>写不完就不写</name></author>
+    <summary>本来只想省下在楼道里来回走的那十分钟，最后变成了一个能按楼层筛选的小工具。</summary>
+  </entry>
+  <entry>
+    <title>示例 · 秋天最好看的那段楼梯，我拍了三年</title>
+    <link rel="alternate" type="text/html" href="https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-09-20-autumn-stairs"/>
+    <id>https://xn--pssa0vz4e155inzt.com/submissions.html#s-sample-2026-09-20-autumn-stairs</id>
+    <published>2026-09-20T00:00:00+08:00</published>
+    <updated>2026-09-20T00:00:00+08:00</updated>
+    <category term="photo" label="影像记录"/>
+    <author><name>抱着相机上课</name></author>
+    <summary>同一段楼梯，同一棵树，三个秋天。今年终于把它做成了对比图。</summary>
+  </entry>
+</feed>

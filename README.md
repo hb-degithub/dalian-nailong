@@ -42,7 +42,7 @@
 node tools/build-submissions.mjs
 ```
 
-生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新首页里两对标记之间的内容：`<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间是最新三张推荐卡（一条投稿都没有时换成「怎么投稿」的入口），`<!-- bulletin:start -->` 与 `<!-- bulletin:end -->` 之间是顶部快讯条（有真实投稿就播报最新一条，只有示例或一条都没有时回到固定文案）。它还会给 `sitemap.xml` 里跟着投稿变动的两个地址（首页与投稿页）写 `lastmod`，日期取最新一条投稿的日期；一条投稿都没有时把 `lastmod` 删掉。校验不通过会直接报错，不会写出半个页面。
+生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新首页里两对标记之间的内容：`<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间是最新三张推荐卡（一条投稿都没有时换成「怎么投稿」的入口），`<!-- bulletin:start -->` 与 `<!-- bulletin:end -->` 之间是顶部快讯条（有真实投稿就播报最新一条，只有示例或一条都没有时回到固定文案）。它还会给 `sitemap.xml` 里跟着投稿变动的两个地址（首页与投稿页）写 `lastmod`，日期取最新一条投稿的日期；一条投稿都没有时把 `lastmod` 删掉。最后它会重写 `feed.xml`：一条投稿一个 Atom entry，示例投稿的标题前面带「示例 · 」，日期用 JSON 里的 `date`（统一补 `T00:00:00+08:00`），不拿脚本运行时间冒充发布时间。校验不通过会直接报错，不会写出半个页面。
 
 **忘了重新生成会被拦下来。** `.github/workflows/verify.yml` 在每个 PR 和每次推送到 `main` 时重新跑一遍生成器，再比对提交里的页面：生成物跟 `content/submissions/*.json` 对不上（漏跑生成器，或者手改了 `submissions.html`）就会失败，日志里会打印缺的差异。
 
@@ -84,6 +84,9 @@ node tools/build-submissions.mjs
 - **投稿筛选**：同学投稿页复用同一套筛选逻辑，分类为文字故事 / 作品分享 / 影像记录 / 随手一句。
 - **移动端导航**：汉堡菜单，760px 以下启用。
 - **回到顶部**：滚动超过 600px 后出现。
+- **导航跟随滚动**：首页滚动时顶栏高亮当前所在的分节（`aria-current="location"`），当前页在导航里标成 `aria-current="page"`；样式只看 `#site-nav>a[aria-current]` 这一个钩子，桌面端是下划线加长，移动端换成淡金色渐变加粗。
+- **订阅源**：`feed.xml` 是合法的 Atom 1.0 订阅源，投稿页上的每一条都是一个 entry；九个页面的 `<head>` 里用 `<link rel="alternate" type="application/atom+xml">` 指向它（404 页除外）。
+- **添加到主屏幕**：`site.webmanifest` 给出站点名、主题色和 192/512 的 PNG 图标，iOS 走 `apple-touch-icon`（180）。站点**没有**注册 Service Worker，所以离线时打不开——这是刻意的：一个纯静态站不想引入「缓存住旧内容、更新了也看不到」的麻烦。
 - 系统开启「减少动态效果」（`prefers-reduced-motion`）时，关闭平滑滚动和动画。
 
 站点没有任何网络请求、Cookie、`localStorage` 和第三方统计脚本。
@@ -98,6 +101,8 @@ node tools/build-submissions.mjs
 ├── 404.html          # 地址不存在时的落点；站内链接写成根绝对路径，因为它会在任意深度被访问
 ├── app.js            # 交互逻辑与弹窗内容数据（原生 JS，无依赖）
 ├── styles.css        # 全部样式（已压缩）
+├── feed.xml          # Atom 订阅源，跟着投稿变（由生成器写出，不要手改）
+├── site.webmanifest  # 「添加到主屏幕」用的名称、图标与主题色
 ├── content/
 │   └── submissions/      # 投稿源文件，一条一个 JSON；不上线
 ├── tools/
@@ -115,6 +120,9 @@ node tools/build-submissions.mjs
 │   ├── campus-autumn.webp    # 校园生活卡片 · 漫游校园；数字摸鱼艺术学院页配图
 │   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图；零食数字商学院页配图；同学投稿页首屏（该页 og:image 用的也是它）
 │   ├── campus-seasons.webp   # 校园生活卡片 · 四季；四季导览弹窗配图；龙语国际交流学院页配图
+│   ├── icon-180.png          # iOS 主屏幕图标（apple-touch-icon）
+│   ├── icon-192.png          # manifest 图标；feed.xml 的 <icon> 也用它
+│   ├── icon-512.png          # manifest 大图标
 │   └── seal.svg              # 趣味校徽，同时作为 favicon
 ├── robots.txt
 └── sitemap.xml
