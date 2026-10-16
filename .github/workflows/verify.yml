@@ -1,0 +1,56 @@
+name: 校验
+
+# 为什么需要这个工作流
+#
+# submissions.html 和首页的推荐位，都是 tools/build-submissions.mjs 从
+# content/submissions/*.json 生成的产物，产物必须跟源文件一起提交。
+# 而 deploy.yml 的 paths-ignore 又把 content/** 与 tools/** 排除在部署之外：
+# 「只改 JSON」的提交不会触发部署。两件事撞在一起就是一次静默失败 ——
+# 漏跑生成器时，线上既不报错，也不更新。
+#
+# 这里把那种静默失败变成一次红色失败：改了投稿源文件却忘了重新生成页面，
+# 或者反过来手改了 submissions.html，检查都会挂，并在日志里打印缺的差异。
+#
+# 它在两种情况下跑：
+#   - 每个 PR：评审的时候就能看到生成物是不是同步的；
+#   - 推送到 main：涵盖 paths-ignore 漏掉的那类「只改 JSON」的提交。
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submissions:
+    name: 投稿生成物与源文件一致
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 重新生成，检查提交里的页面是不是最新的
+        run: |
+          if [ ! -f tools/build-submissions.mjs ]; then
+            echo "这个分支上还没有投稿生成器，跳过。"
+            exit 0
+          fi
+
+          node tools/build-submissions.mjs
+
+          if ! git diff --quiet; then
+            echo "::error::content/submissions/ 的改动没有重新生成页面。请在仓库根目录跑一遍 node tools/build-submissions.mjs，把生成的 submissions.html（和 index.html）一起提交。"
+            echo "--- 缺少的改动 ---"
+            git --no-pager diff
+            echo "------------------"
+            exit 1
+          fi
+
+          echo "生成物与投稿源文件一致。"

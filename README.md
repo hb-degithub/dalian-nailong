@@ -44,6 +44,8 @@ node tools/build-submissions.mjs
 
 生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新 `index.html` 里 `<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间的三张推荐卡。校验不通过会直接报错，不会写出半个页面。
 
+**忘了重新生成会被拦下来。** `.github/workflows/verify.yml` 在每个 PR 和每次推送到 `main` 时重新跑一遍生成器，再比对提交里的页面：生成物跟 `content/submissions/*.json` 对不上（漏跑生成器，或者手改了 `submissions.html`）就会失败，日志里会打印缺的差异。
+
 **收到一条新投稿**
 
 在 `content/submissions/` 下新建一个 JSON 文件，一条一个文件，文件名建议 `日期-短标题.json`：
@@ -177,7 +179,7 @@ font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-a
 
 其他说明：
 
-- 只改 `README.md`、`CONTRIBUTING.md`、PR 模板、`content/` 或 `tools/` 的推送不触发部署。需要重新发布时，可以在 Actions 页面手动运行「部署到线上」。
+- 只改 `README.md`、`CONTRIBUTING.md`、PR 模板、`content/` 或 `tools/` 的推送不触发部署——也就是说，漏跑生成器不会有部署报错，这一层由 `.github/workflows/verify.yml`（校验）兜住。需要重新发布时，可以在 Actions 页面手动运行「部署到线上」。
 - 同一时间只会有一个部署在跑，后来的排队等候。
 - 想回滚到更早的版本，需要登录服务器手动切换 `current` 软链。
 - 部署用到的 Secrets：`DEPLOY_SSH_KEY`、`DEPLOY_HOST`、`DEPLOY_KNOWN_HOSTS`。服务器地址和密钥都不在代码里。
