@@ -35,7 +35,8 @@
 - **缓存版本号**：改了 `styles.css` 或 `app.js`，就要把全部页面里的 `?v=N` 加 1。顶栏、页脚、版本号在全部 10 个页面保持一致（首页、`clubs.html`、`submissions.html`、`404.html`、`colleges/` 下的六个页面）。只有 `404.html` 是个例外：它会在任意深度被访问，站内链接与本站资源写的是根绝对路径（`/styles.css`、`/clubs.html`），其余页面用相对路径；改导航、页脚或版本号时两边都要改。
 - **404 页**：`404.html` 要真的生效，服务器得把找不到的路径交给它（nginx 里是 `error_page 404 /404.html;`）。只改仓库里的文件不够。
 - **真实学生组织页**：`clubs.html` 讲的是真实组织，改文案前先读 README「真实学生组织页」的来源分层与禁止编造约束。
-- **同学投稿页**：`submissions.html` 由 `content/submissions/` 里的 JSON 经 `node tools/build-submissions.mjs` 生成，不要手改；同一个生成器还会更新首页的推荐位与快讯条、`sitemap.xml` 里两个地址的 `lastmod`、以及 `feed.xml`（Atom 订阅源）。改投稿内容或页面模板都要跑一遍生成器，把生成的 HTML 与 `feed.xml` 一起提交。同一件事 CI 也会做一遍（`.github/workflows/verify.yml`），对不上就会失败。
+- **同学投稿页**：`submissions.html` 由 `content/submissions/` 里的 JSON 经 `node tools/build-submissions.mjs` 生成，不要手改；同一个生成器还会更新首页的推荐位与快讯条、`sitemap.xml` 里两个地址的 `lastmod`、`feed.xml`（Atom 订阅源），以及投稿页分享用的 `og:image`／`twitter:image`（对成首屏那张图）。改投稿内容或页面模板都要跑一遍生成器，把生成的 HTML 与 `feed.xml` 一起提交。同一件事 CI 也会做一遍（`.github/workflows/verify.yml`），对不上就会失败。
+- **分享卡片**：10 个页面都带 `og:*` 与 `twitter:*`，`twitter:card` 固定 `summary_large_image`，`og:image` 与 `twitter:image` 必须是同一张（自检脚本会查）。新增页面时照着现有页面的 `<head>` 抄一份，别忘了 `og:site_name`。
 - **主屏幕图标**：`assets/icon-180.png` / `icon-192.png` / `icon-512.png` 是从 `assets/seal.svg` 导出的位图（正方形画布，四周留 4% 透明边距）。改了校徽就要重新导出这三个文件，否则「添加到主屏幕」上还是旧图标。
 - **新增学院**：`app.js` 的 `colleges`、`#colleges` 卡片、`colleges/` 下新建的页面、`#student-college` 的 `<option>`，四处都要改。
 - **新增或删除图片**：同步更新 README 的目录结构。

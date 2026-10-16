@@ -42,7 +42,7 @@
 node tools/build-submissions.mjs
 ```
 
-生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新首页里两对标记之间的内容：`<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间是最新三张推荐卡（一条投稿都没有时换成「怎么投稿」的入口），`<!-- bulletin:start -->` 与 `<!-- bulletin:end -->` 之间是顶部快讯条（有真实投稿就播报最新一条，只有示例或一条都没有时回到固定文案）。它还会给 `sitemap.xml` 里跟着投稿变动的两个地址（首页与投稿页）写 `lastmod`，日期取最新一条投稿的日期；一条投稿都没有时把 `lastmod` 删掉。最后它会重写 `feed.xml`：一条投稿一个 Atom entry，示例投稿的标题前面带「示例 · 」，日期用 JSON 里的 `date`（统一补 `T00:00:00+08:00`），不拿脚本运行时间冒充发布时间。校验不通过会直接报错，不会写出半个页面。
+生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新首页里两对标记之间的内容：`<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间是最新三张推荐卡（一条投稿都没有时换成「怎么投稿」的入口），`<!-- bulletin:start -->` 与 `<!-- bulletin:end -->` 之间是顶部快讯条（有真实投稿就播报最新一条，只有示例或一条都没有时回到固定文案）。它还会给 `sitemap.xml` 里跟着投稿变动的两个地址（首页与投稿页）写 `lastmod`，日期取最新一条投稿的日期；一条投稿都没有时把 `lastmod` 删掉。投稿页分享出去的配图（`og:image` 与 `twitter:image`）也由它对成首屏那张 `assets/campus-life.webp`，不再继承模板页的图。最后它会重写 `feed.xml`：一条投稿一个 Atom entry，示例投稿的标题前面带「示例 · 」，日期用 JSON 里的 `date`（统一补 `T00:00:00+08:00`），不拿脚本运行时间冒充发布时间。校验不通过会直接报错，不会写出半个页面。
 
 **忘了重新生成会被拦下来。** `.github/workflows/verify.yml` 在每个 PR 和每次推送到 `main` 时重新跑一遍生成器，再比对提交里的页面：生成物跟 `content/submissions/*.json` 对不上（漏跑生成器，或者手改了 `submissions.html`）就会失败，日志里会打印缺的差异。
 
@@ -87,6 +87,7 @@ node tools/build-submissions.mjs
 - **导航跟随滚动**：首页滚动时顶栏高亮当前所在的分节（`aria-current="location"`），当前页在导航里标成 `aria-current="page"`；样式只看 `#site-nav>a[aria-current]` 这一个钩子，桌面端是下划线加长，移动端换成淡金色渐变加粗。
 - **订阅源**：`feed.xml` 是合法的 Atom 1.0 订阅源，投稿页上的每一条都是一个 entry；九个页面的 `<head>` 里用 `<link rel="alternate" type="application/atom+xml">` 指向它（404 页除外）。
 - **添加到主屏幕**：`site.webmanifest` 给出站点名、主题色和 192/512 的 PNG 图标，iOS 走 `apple-touch-icon`（180）。站点**没有**注册 Service Worker，所以离线时打不开——这是刻意的：一个纯静态站不想引入「缓存住旧内容、更新了也看不到」的麻烦。
+- **分享卡片**：10 个页面都带 `og:*` 与 `twitter:*`，`twitter:card` 用 `summary_large_image`，配图与 `og:image` 是同一张（投稿页那张由生成器统一）。分享到 X 或聊天工具时，标题、描述与配图取自页面自己，而不是继承首页的。
 - 系统开启「减少动态效果」（`prefers-reduced-motion`）时，关闭平滑滚动和动画。
 
 站点没有任何网络请求、Cookie、`localStorage` 和第三方统计脚本。

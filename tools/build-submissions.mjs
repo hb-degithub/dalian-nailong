@@ -374,6 +374,10 @@ function buildPage(items) {
   swap(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escapeAttr(pageTitle)}">`, 'og:title');
   swap(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${escapeAttr(ogDescription)}">`, 'og:description');
   swap(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeAttr(`${SITE}/${HERO_IMAGE}`)}">`, 'og:image');
+  swap(/<meta name="twitter:card" content="[^"]*">/, `<meta name="twitter:card" content="summary_large_image">`, 'twitter:card');
+  swap(/<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${escapeAttr(pageTitle)}">`, 'twitter:title');
+  swap(/<meta name="twitter:description" content="[^"]*">/, `<meta name="twitter:description" content="${escapeAttr(ogDescription)}">`, 'twitter:description');
+  swap(/<meta name="twitter:image" content="[^"]*">/, `<meta name="twitter:image" content="${escapeAttr(`${SITE}/${HERO_IMAGE}`)}">`, 'twitter:image');
   head += '</head>';
 
   const bodyStart = reference.indexOf('<body>');
