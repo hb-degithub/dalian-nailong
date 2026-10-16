@@ -46,7 +46,7 @@ jobs:
           node tools/build-submissions.mjs
 
           if ! git diff --quiet; then
-            echo "::error::content/submissions/ 的改动没有重新生成页面。请在仓库根目录跑一遍 node tools/build-submissions.mjs，把生成的 submissions.html（和 index.html）一起提交。"
+            echo "::error::content/submissions/ 的改动没有重新生成页面。请在仓库根目录跑一遍 node tools/build-submissions.mjs，把生成的 submissions.html、index.html 和 sitemap.xml 一起提交。"
             echo "--- 缺少的改动 ---"
             git --no-pager diff
             echo "------------------"

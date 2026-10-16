@@ -4,11 +4,14 @@
  * 用法（在仓库根目录执行）：
  *   node tools/build-submissions.mjs
  *
- * 它做三件事：
+ * 它做五件事：
  *   1. 读取 content/submissions/*.json，逐条校验；
  *   2. 生成 submissions.html（投稿展示页）；
  *   3. 把首页 <!-- submissions:start --> 与 <!-- submissions:end --> 之间的
- *      推荐位替换成最新几条投稿。
+ *      推荐位替换成最新几条投稿；
+ *   4. 把首页 <!-- bulletin:start --> 与 <!-- bulletin:end --> 之间的快讯条
+ *      换成最新一条真实投稿（没有真实投稿时回到固定文案）；
+ *   5. 给 sitemap.xml 里跟着投稿变的两个地址写 lastmod。
  *
  * 站点是纯静态的：这个脚本只在本地跑，产物是要提交进仓库的 HTML。
  * 发布仍然靠「推送到 main → Actions 打包上线」，部署链没有任何改动。
@@ -25,9 +28,13 @@ const CONTENT_DIR = path.join(ROOT, 'content', 'submissions');
 const TEMPLATE = path.join(ROOT, 'clubs.html');
 const OUTPUT = path.join(ROOT, 'submissions.html');
 const HOMEPAGE = path.join(ROOT, 'index.html');
+const SITEMAP = path.join(ROOT, 'sitemap.xml');
 
 const SITE = 'https://xn--pssa0vz4e155inzt.com';
 const HOMEPAGE_TEASER_COUNT = 3;
+
+/** 投稿页首屏主图。分享用的 og:image 必须跟它一致，所以只在这里写一次。 */
+const HERO_IMAGE = 'assets/campus-life.webp';
 
 /** 分类：key 写到 data-category，label 用于展示与筛选按钮。 */
 const CATEGORIES = [
@@ -239,6 +246,9 @@ function renderCard(item) {
 }
 
 function renderFilterButtons(items) {
+  // 一条投稿都没有的时候，只剩一个「全部」按钮什么也筛不出来，整排就不渲染。
+  if (items.length === 0) return '';
+
   const used = new Set(items.map((item) => item.category));
   const buttons = [`<button data-filter="all" aria-pressed="true">全部</button>`];
   for (const category of CATEGORIES) {
@@ -264,12 +274,16 @@ function renderTeaser(item) {
 
 function buildMain(items) {
   const sampleCount = items.filter((item) => item.sample).length;
+  const hero = readImageSize(HERO_IMAGE);
   const listInner = items.length > 0
     ? `    <div class="submission-grid">\n${items.map(renderCard).join('\n')}\n    </div>`
     : `    <p class="submission-empty">还没有发布出来的投稿。第一封留给你。</p>`;
+  const listFootnote = items.length > 0
+    ? '按投稿日期从新到旧排列。筛选按钮可以用 Tab 键聚焦、回车或空格切换。'
+    : '投稿发布后会按日期从新到旧排列，筛选按钮也会跟着出现。';
 
   return `  <section class="college-hero" aria-labelledby="submissions-title">
-    <img class="college-hero-image" src="assets/campus-life.webp" width="1280" height="719" alt="群山之间的现代校园与晚霞" fetchpriority="high">
+    <img class="college-hero-image" src="${HERO_IMAGE}" width="${hero.width}" height="${hero.height}" alt="群山之间的现代校园与晚霞" fetchpriority="high">
     <div class="college-hero-shade"></div>
     <div class="college-hero-content">
       <a class="college-back" href="index.html">← 返回首页</a>
@@ -292,7 +306,7 @@ function buildMain(items) {
   <section class="section" id="list" aria-labelledby="list-title"><div class="container">
     <div class="section-head"><div><p class="eyebrow">02 / ALL SUBMISSIONS</p><h2 id="list-title">全部投稿</h2></div>${renderFilterButtons(items)}</div>
 ${listInner}
-    <p class="section-footnote">按投稿日期从新到旧排列。筛选按钮可以用 Tab 键聚焦、回车或空格切换。</p>
+    <p class="section-footnote">${listFootnote}</p>
   </div></section>
   <section class="section" id="how" aria-labelledby="how-title"><div class="container">
     <div class="section-head"><div><p class="eyebrow">03 / HOW TO SUBMIT</p><h2 id="how-title">怎么投稿</h2></div><p>投一次就够了，<br>不用先写得很好。</p></div>
@@ -346,6 +360,7 @@ function buildPage(items) {
   swap(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${escapeAttr(canonical)}">`, 'canonical');
   swap(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${escapeAttr(pageTitle)}">`, 'og:title');
   swap(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${escapeAttr(ogDescription)}">`, 'og:description');
+  swap(/<meta property="og:image" content="[^"]*">/, `<meta property="og:image" content="${escapeAttr(`${SITE}/${HERO_IMAGE}`)}">`, 'og:image');
   head += '</head>';
 
   const bodyStart = reference.indexOf('<body>');
@@ -360,34 +375,83 @@ function buildPage(items) {
   return `${head}\n${top}\n<main id="main">\n${buildMain(items)}\n${bottom}`;
 }
 
-/* ------------------------------------------------------- 首页推荐位替换 */
+/* ------------------------------------------- 首页推荐位、快讯条与 sitemap */
 
 const MARKER_START = '<!-- submissions:start -->';
 const MARKER_END = '<!-- submissions:end -->';
+const BULLETIN_START = '<!-- bulletin:start -->';
+const BULLETIN_END = '<!-- bulletin:end -->';
+const BULLETIN_DEFAULT = '「Hello, 奶龙！」云端入学季，快乐永不截止。';
+
+/** 把两个标记之间的内容换成 inner，标记本身不动。 */
+function replaceRegion(html, start, end, inner, label) {
+  const from = html.indexOf(start);
+  const to = html.indexOf(end);
+  if (from < 0 || to < 0 || to < from) {
+    throw new Error(`index.html 里找不到成对的 ${start} / ${end} 标记，无法更新${label}。`);
+  }
+  return html.slice(0, from + start.length) + inner + html.slice(to);
+}
+
+/**
+ * 首页快讯条。
+ * 只有真实投稿才值得播报 —— 标着「示例」的是占位内容，当新闻报出来就是误导。
+ * 没有真实投稿时回到固定文案，首页不会出现一条空快讯。
+ */
+function bulletinText(items) {
+  const real = items.filter((item) => !item.sample);
+  if (real.length === 0) return BULLETIN_DEFAULT;
+
+  const latest = real[0];
+  return `同学投稿：《${escapeHTML(latest.title)}》· ${escapeHTML(latest.date)}，投稿页共 ${real.length} 篇。`;
+}
 
 function updateHomepage(items) {
   const html = fs.readFileSync(HOMEPAGE, 'utf8');
-  const start = html.indexOf(MARKER_START);
-  const end = html.indexOf(MARKER_END);
-  if (start < 0 || end < 0 || end < start) {
-    throw new Error(`index.html 里找不到成对的 ${MARKER_START} / ${MARKER_END} 标记，无法更新首页推荐位。`);
-  }
 
   const teasers = items.slice(0, HOMEPAGE_TEASER_COUNT);
   const inner = teasers.length > 0
     ? `    <div class="college-grid-3">\n${teasers.map(renderTeaser).join('\n')}\n    </div>`
     : `    <p class="submission-empty">还没有发布出来的投稿。第一封留给你。</p>`;
+  // 一条投稿都没有的时候，「看看全部投稿」是扇进不去的门，改成指向投稿方式。
+  const link = teasers.length > 0
+    ? `    <a class="text-link" href="submissions.html">看看全部投稿 <span aria-hidden="true">↗</span></a>`
+    : `    <a class="text-link" href="submissions.html#how">看看怎么投稿 <span aria-hidden="true">↗</span></a>`;
 
-  const block = [
-    MARKER_START,
-    inner,
-    `    <a class="text-link" href="submissions.html">看看全部投稿 <span aria-hidden="true">↗</span></a>`,
-    `    ${MARKER_END}`
-  ].join('\n');
+  let next = replaceRegion(html, MARKER_START, MARKER_END, `\n${inner}\n${link}\n    `, '首页推荐位');
+  next = replaceRegion(next, BULLETIN_START, BULLETIN_END, bulletinText(items), '首页快讯条');
 
-  const next = html.slice(0, start) + block + html.slice(end + MARKER_END.length);
   if (next !== html) {
     fs.writeFileSync(HOMEPAGE, next, 'utf8');
+    return true;
+  }
+  return false;
+}
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * sitemap.xml：只给「内容跟着投稿变」的两个地址写 lastmod。
+ *
+ * 日期取最新一条投稿的日期，不取当天日期 —— 取当天的话，每次跑生成器都会产出
+ * 不一样的 sitemap，「提交里的产物和源文件一致」这条 CI 检查就永远过不了。
+ * 一条投稿都没有时把 lastmod 删掉：宁可不写，也不写一个编出来的日期。
+ */
+function updateSitemap(items) {
+  const xml = fs.readFileSync(SITEMAP, 'utf8');
+  const lastmod = items.length > 0 ? items[0].sortKey : null;
+
+  let next = xml;
+  for (const url of [`${SITE}/`, `${SITE}/submissions.html`]) {
+    // lastmod 可能有 0 个、1 个，也可能被人手改出好几个，统一收成一个。
+    next = next.replace(
+      new RegExp(`(<loc>${escapeRegExp(url)}</loc>)(?:<lastmod>[^<]*</lastmod>)*`),
+      (match, loc) => (lastmod ? `${loc}<lastmod>${lastmod}</lastmod>` : loc)
+    );
+  }
+
+  if (next !== xml) {
+    fs.writeFileSync(SITEMAP, next, 'utf8');
     return true;
   }
   return false;
@@ -400,11 +464,13 @@ const page = buildPage(items);
 fs.writeFileSync(OUTPUT, page, 'utf8');
 
 const homepageChanged = updateHomepage(items);
+const sitemapChanged = updateSitemap(items);
 
 const sampleCount = items.filter((item) => item.sample).length;
 console.log(`投稿条数：${items.length}（其中示例 ${sampleCount} 条）`);
 console.log(`已生成 submissions.html（${page.length} 字符）`);
-console.log(`首页推荐位：${homepageChanged ? '已更新' : '无变化'}`);
+console.log(`首页推荐位与快讯条：${homepageChanged ? '已更新' : '无变化'}`);
+console.log(`sitemap.xml：${sitemapChanged ? '已更新 lastmod' : '无变化'}`);
 if (sampleCount > 0) {
   console.log('提示：示例内容仅用于演示界面，收到真实投稿后请把 content/submissions/ 下的 sample-*.json 删掉再重新生成。');
 }

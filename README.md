@@ -42,7 +42,7 @@
 node tools/build-submissions.mjs
 ```
 
-生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新 `index.html` 里 `<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间的三张推荐卡。校验不通过会直接报错，不会写出半个页面。
+生成器会读 `content/submissions/*.json`，重写 `submissions.html`，并同步更新首页里两对标记之间的内容：`<!-- submissions:start -->` 与 `<!-- submissions:end -->` 之间是最新三张推荐卡（一条投稿都没有时换成「怎么投稿」的入口），`<!-- bulletin:start -->` 与 `<!-- bulletin:end -->` 之间是顶部快讯条（有真实投稿就播报最新一条，只有示例或一条都没有时回到固定文案）。它还会给 `sitemap.xml` 里跟着投稿变动的两个地址（首页与投稿页）写 `lastmod`，日期取最新一条投稿的日期；一条投稿都没有时把 `lastmod` 删掉。校验不通过会直接报错，不会写出半个页面。
 
 **忘了重新生成会被拦下来。** `.github/workflows/verify.yml` 在每个 PR 和每次推送到 `main` 时重新跑一遍生成器，再比对提交里的页面：生成物跟 `content/submissions/*.json` 对不上（漏跑生成器，或者手改了 `submissions.html`）就会失败，日志里会打印缺的差异。
 
@@ -112,7 +112,7 @@ node tools/build-submissions.mjs
 │   ├── hero-campus.webp      # 首屏主视觉（AI 创作）；健康午睡科技学院页配图
 │   ├── campus-overview.webp  # 学校概况配图；「漫游校园」导览弹窗配图；人工智龙学院页配图
 │   ├── campus-autumn.webp    # 校园生活卡片 · 漫游校园；数字摸鱼艺术学院页配图
-│   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图；零食数字商学院页配图
+│   ├── campus-life.webp      # 校园生活卡片 · SOVO；SOVO 导览弹窗配图；零食数字商学院页配图；同学投稿页首屏（该页 og:image 用的也是它）
 │   ├── campus-seasons.webp   # 校园生活卡片 · 四季；四季导览弹窗配图；龙语国际交流学院页配图
 │   └── seal.svg              # 趣味校徽，同时作为 favicon
 ├── robots.txt
