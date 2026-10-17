@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 想自己动手改网站
+    url: https://github.com/zp-home/dalian-nailong/blob/main/CONTRIBUTING.md
+    about: 提交信息格式、CSP 与缓存版本号的注意事项，都写在这里。
