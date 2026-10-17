@@ -1,0 +1,79 @@
+name: 网站出问题了
+description: 页面显示不对、点了没反应、链接打不开、图片裂了，用这个
+title: "[问题] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢你来报问题。把「在哪个页面、用什么设备、看到了什么」写清楚，多半不用来回问就能直接修。
+
+        如果问题只在你这边出现，也欢迎先换个浏览器或拉一下刷新再报——但报了也没关系，修不了至少能记下来。
+
+  - type: input
+    id: page
+    attributes:
+      label: 出问题的页面
+      description: 直接把地址栏里的地址贴过来。
+      placeholder: 例如：https://xn--pssa0vz4e155inzt.com/clubs.html
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: 你用什么设备看的
+      options:
+        - 手机 · iOS
+        - 手机 · Android
+        - 手机 · 其他或不确定
+        - 电脑 · Windows
+        - 电脑 · macOS
+        - 电脑 · Linux
+        - 其他或不确定
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: 浏览器
+      description: 不确定就写个名字，例如「微信里打开的」「夸克」。
+      placeholder: 例如：微信内置浏览器 / Chrome 141 / Safari
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 你看到的现象。截图、白屏、报错文字都可以直接贴进来。
+      placeholder: 例如：点「云端入学」之后弹窗没出来，页面上什么都没变。
+    validations:
+      required: true
+
+  - type: textarea
+    id: expect
+    attributes:
+      label: 你本来期待看到什么（可跳过）
+      placeholder: 例如：期待弹窗直接打开，或者至少有个提示告诉我去哪一步。
+    validations:
+      required: false
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: 已经试过什么（可跳过）
+      description: 例如换过浏览器、清过缓存、换过网络。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前顺手确认
+      options:
+        - label: 我刷新过一次页面，问题还在。
+          required: false
+        - label: 我贴出来的内容里没有别人的真实姓名、学号、手机号、宿舍门牌或未公开的聊天记录。
+          required: true
