@@ -18,6 +18,8 @@ permissions:
 
 jobs:
   deploy:
+    # 只在上游运行；fork 没有 DEPLOY_* secrets，跑这里只会失败
+    if: github.repository == 'zp-home/dalian-nailong'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
