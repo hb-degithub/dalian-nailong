@@ -1,67 +1,14 @@
 (() => {
   'use strict';
 
+  // 六所脑洞学院的名称，用于纪念卡表单校验与卡片文案（学院详情见 colleges/ 下的独立页面）
   const colleges = {
-    code: {
-      name: '奶龙软件工程学院',
-      motto: '把灵感写进代码，把 Bug 留在昨天。',
-      paragraphs: [
-        '这里的第一堂课，是让一只奶龙学会对世界说 Hello。我们把软件工程的学习日常变成校园脑洞：一起拆解需求、设计界面、写下代码，也认真对待每一次“为什么在我电脑上可以运行”。',
-        '从一个好用的小工具，到一款能让同学会心一笑的应用，项目始终是主角。组队时可以带零食，但请记得带上清晰的思路，以及愿意一起找 Bug 的耐心。'
-      ],
-      courses: ['面向奶龙的程序设计', 'Bug 追踪与情绪稳定', '从零到一的校园应用工坊'],
-      graduation: '做出一个自己愿意每天使用的小作品，并让另一只奶龙看懂你的 README。'
-    },
-    ai: {
-      name: '人工智龙学院',
-      motto: '给好奇心一点算力。',
-      paragraphs: [
-        '如果奶龙会学习，它会先认出食堂的鸡腿，还是先学会准时起床？在这所脑洞学院，我们用轻松的问题打开人工智能的大门，理解数据、模型与人之间的关系。',
-        '训练一个模型，也训练提出好问题的能力。我们想象用机器学习识别校园里的四季，用智能工具帮助整理知识，同时保留奶龙最珍贵的本领：独立思考与大胆发问。'
-      ],
-      courses: ['奶龙行为识别入门', '机器学习与鸡腿分类', '负责任的人工智能创作'],
-      graduation: '向一位没有学过人工智能的朋友，解释你的模型会什么、不会什么，以及为什么。'
-    },
-    design: {
-      name: '数字摸鱼艺术学院',
-      motto: '认真观察世界，快乐制造灵感。',
-      paragraphs: [
-        '“摸鱼”在这里是一种观察练习：留意坡道旁的光、雨后石墙的颜色，以及同学打开新作品时的表情。把这些小发现，变成海报、动画、交互和会讲故事的数字作品。',
-        '灵感可以天马行空，作品需要照顾真实的使用感受。我们鼓励画出自己的奶龙，也鼓励推敲每个按钮、每行文字和每一个让界面更好用的细节。'
-      ],
-      courses: ['奶龙表情与角色动画', '校园灵感采集与视觉叙事', '让按钮愿意被点的交互设计'],
-      graduation: '完成一件有自己风格的作品，并清楚说明它想为谁带来什么。'
-    },
-    business: {
-      name: '零食数字商学院',
-      motto: '算得清成本，也装得下热爱。',
-      paragraphs: [
-        '从一包薯片的定价，到一次校园市集的运营，商业问题藏在生活的每个角落。这所脑洞学院把数字商业的学习，放进奶龙熟悉的零食、社团和小小创意里。',
-        '我们在想象中的市集练习用户研究、数据分析和团队协作。所有计划都要回答一个朴素的问题：这件事到底解决了谁的需要，能不能长久地做好？'
-      ],
-      courses: ['零食经济学与预算管理', '校园市集数字运营', '用数据讲明白一门小生意'],
-      graduation: '写出一份逻辑清楚的创意计划，既算明白账，也说明白它的价值。'
-    },
-    language: {
-      name: '龙语国际交流学院',
-      motto: '一句“你好”，让世界变得更近。',
-      paragraphs: [
-        '奶龙语言的核心语法，或许是“先微笑，再开口”。在这所脑洞学院，我们把语言学习想象成一次持续发生的交流：介绍自己的城市，也认真听见不同的文化与生活。',
-        '练习从来不只在单词本里。为一位远方的朋友设计校园路线，给自己的作品写一段外语介绍，或一起讨论一个有趣的话题，都是迈向世界的小小一步。'
-      ],
-      courses: ['用外语介绍一只奶龙', '跨文化交流与校园故事', '技术作品的双语表达'],
-      graduation: '用正在学习的语言，完整分享一件让你感到自豪的小事。'
-    },
-    health: {
-      name: '健康午睡科技学院',
-      motto: '照顾好自己，灵感才有续航。',
-      paragraphs: [
-        '奶龙相信，成长的课程表里也应留出散步、休息和好好吃饭的位置。这所脑洞学院用健康科技的视角，关注学习生活中的舒适、节奏与日常习惯。',
-        '从友好的运动提醒，到更易理解的健康信息界面，我们设想用技术照顾生活的小细节。这里的“午睡科技”是校园玩梗，不提供医学判断，也没有代替专业服务的魔法。'
-      ],
-      courses: ['久坐奶龙的课间活动设计', '健康信息的友好表达', '日常习惯与可穿戴交互'],
-      graduation: '设计一个温柔实用的生活小工具，同时给自己的日常留出规律的休息时间。'
-    }
+    code: { name: '奶龙软件工程学院' },
+    ai: { name: '人工智龙学院' },
+    design: { name: '数字摸鱼艺术学院' },
+    business: { name: '零食数字商学院' },
+    language: { name: '龙语国际交流学院' },
+    health: { name: '健康午睡科技学院' }
   };
 
   const stories = {
@@ -270,26 +217,6 @@
       });
     };
 
-    const showCollege = (key, trigger) => {
-      const college = colleges[key];
-      if (!college || !detailDialog || !detailContent) return;
-      setDetailHeader('脑洞学科 / IMAGINARY SCHOOL', college.name);
-      detailContent.append(makeElement('p', 'dialog-motto', college.motto));
-      appendParagraphs(college.paragraphs);
-      const section = makeElement('section', 'dialog-section');
-      section.append(makeElement('h3', '', '三门想象中的课程'));
-      const courses = makeElement('ul', 'course-list');
-      college.courses.forEach((course) => courses.append(makeElement('li', '', course)));
-      section.append(courses);
-      detailContent.append(section);
-      const graduation = makeElement('section', 'dialog-section');
-      graduation.append(makeElement('h3', '', '奶龙式毕业要求'));
-      graduation.append(makeElement('p', 'dialog-description', college.graduation));
-      detailContent.append(graduation);
-      detailContent.append(makeElement('p', 'dialog-note', '以上为校园趣味创作，学院、课程与毕业要求均为虚构；不代表大连东软信息学院的真实教学或招生安排。'));
-      openDialog(detailDialog, trigger);
-    };
-
     const showStory = (key, trigger) => {
       const story = stories[key];
       if (!story || !detailDialog || !detailContent) return;
@@ -319,18 +246,13 @@
 
     document.addEventListener('click', (event) => {
       if (!(event.target instanceof Element)) return;
-      const trigger = event.target.closest('[data-college], [data-story], [data-tour], [data-enroll], [data-close]');
+      const trigger = event.target.closest('[data-story], [data-tour], [data-enroll], [data-close]');
       if (!trigger) return;
       if (trigger.hasAttribute('data-close')) {
         const dialog = trigger.closest('dialog');
         if (dialog) {
           event.preventDefault();
           closeDialog(dialog);
-        }
-      } else if (trigger.hasAttribute('data-college')) {
-        if (colleges[trigger.dataset.college] && detailDialog && detailContent) {
-          event.preventDefault();
-          showCollege(trigger.dataset.college, trigger);
         }
       } else if (trigger.hasAttribute('data-story')) {
         if (stories[trigger.dataset.story] && detailDialog && detailContent) {
